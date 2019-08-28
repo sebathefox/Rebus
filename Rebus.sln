@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RebusClient", "RebusClient\RebusClient.csproj", "{721EE37F-4E14-4EA8-8610-8FB933C7946F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RebusCore", "RebusCore\RebusCore.csproj", "{798029E6-BB56-46BD-8F17-5D82F4CD6AD3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{721EE37F-4E14-4EA8-8610-8FB933C7946F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{721EE37F-4E14-4EA8-8610-8FB933C7946F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{721EE37F-4E14-4EA8-8610-8FB933C7946F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{798029E6-BB56-46BD-8F17-5D82F4CD6AD3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{798029E6-BB56-46BD-8F17-5D82F4CD6AD3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{798029E6-BB56-46BD-8F17-5D82F4CD6AD3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{798029E6-BB56-46BD-8F17-5D82F4CD6AD3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
