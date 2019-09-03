@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{798029E6-BB56-46BD-8F17-5D82F4CD6AD3}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <ProjectGuid>{3D8832FE-E68D-4633-8CAA-646D7B176884}</ProjectGuid>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>RebusCore</RootNamespace>
-    <AssemblyName>RebusCore</AssemblyName>
+    <RootNamespace>RebusServer</RootNamespace>
+    <AssemblyName>RebusServer</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -38,17 +38,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Client\Client.cs" />
-    <Compile Include="Client\IClient.cs" />
-    <Compile Include="Commands\CommandHandler.cs" />
-    <Compile Include="Commands\ICommand.cs" />
-    <Compile Include="ConfigLoader.cs" />
-    <Compile Include="Plugin\IPlugin.cs" />
-    <Compile Include="Plugin\PluginLoader.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Server\IServer.cs" />
-    <Compile Include="Server\Server.cs" />
-    <Compile Include="StateObject.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\RebusCore\RebusCore.csproj">
+      <Project>{798029e6-bb56-46bd-8f17-5d82f4cd6ad3}</Project>
+      <Name>RebusCore</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

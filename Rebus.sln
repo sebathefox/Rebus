@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RebusClient", "RebusClient\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RebusCore", "RebusCore\RebusCore.csproj", "{798029E6-BB56-46BD-8F17-5D82F4CD6AD3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RebusServer", "RebusServer\RebusServer.csproj", "{3D8832FE-E68D-4633-8CAA-646D7B176884}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{798029E6-BB56-46BD-8F17-5D82F4CD6AD3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{798029E6-BB56-46BD-8F17-5D82F4CD6AD3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{798029E6-BB56-46BD-8F17-5D82F4CD6AD3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3D8832FE-E68D-4633-8CAA-646D7B176884}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3D8832FE-E68D-4633-8CAA-646D7B176884}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3D8832FE-E68D-4633-8CAA-646D7B176884}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3D8832FE-E68D-4633-8CAA-646D7B176884}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
