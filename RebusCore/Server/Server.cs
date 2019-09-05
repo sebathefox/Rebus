@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Management.Instrumentation;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using RebusCore.Commands;
+using RebusCore.Debug;
 using RebusCore.Plugin;
 
 namespace RebusCore.Server
@@ -13,11 +13,11 @@ namespace RebusCore.Server
     /// <summary>
     /// A basic self sustainable server class.
     /// </summary>
-    public sealed class Server : IServer
+    public sealed class Server : IDisposable
     {
         #region Fields
 
-        // The raw underlaying socket used for server communication.
+        // The raw underlying socket used for server communication.
         private Socket _listener;
 
         // A thread safe unlinked list that holds the clients.
@@ -31,44 +31,65 @@ namespace RebusCore.Server
 
         private CommandHandler _commandHandler;
 
+        private Dictionary<string, object> _config;
+
         #endregion
 
         public void Dispose()
         {
+            _listener.Close();
+            _listener.Dispose();
+            
             foreach (Socket client in _clients)
             {
                 client.Disconnect(false);
                 client.Close(2);
                 client.Dispose();
             }
-            
-            _listener.Close();
-            _listener.Dispose();
         }
 
         /// <summary>
         /// Initializes the server with it's default parameters and sets it to listen on the specified endpoint.
         /// </summary>
-        /// <param name="ep">The endpoint to listen on.</param>
-        public void Initialize(IPEndPoint ep)
+        /// <param name="args">The program arguments if any.</param>
+        public void Initialize(string[] args)
         {
+            _config = ConfigLoader.LoadConfig("./config.txt");
+            
+            Logger.Init(_config["logLocation"].ToString());
+            
             _isRunning = true;
             _listener = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            _clients = new ConcurrentBag<Socket>();
             
-            LoadPlugins("PathToBeLoadedFromConfigFile");
-
-            if (_plugins != null)
+            Logger.Log("Created Socket");
+            
+            _clients = new ConcurrentBag<Socket>();
+            _commandHandler = new CommandHandler();
+            
+            Logger.Log("Loading Plugins...");
+            
+            _plugins = PluginLoader.LoadPlugins(_config["pluginFolder"].ToString());
+            
+            foreach (IPlugin plugin in _plugins)
             {
-                foreach (IPlugin plugin in _plugins)
-                {
-                    plugin.Initialize();
-                }
+                plugin.Initialize();
+
+                Logger.Log("LOADED PLUGIN: " + plugin.GetType().ToString());
+                
+                _commandHandler.AddCommands(plugin.GetCommands());
             }
             
+                
+            IPEndPoint ep = new IPEndPoint(IPAddress.Parse(_config["listenAddress"].ToString()),
+            int.Parse(_config["port"].ToString()));
+            
+            
+            Logger.Log("Binding to Endpoint: " + ep.ToString());
             _listener.Bind(ep);
 
+            Logger.Log("Bound");
             _listener.Listen(10);
+            Logger.Log("Listening...");
         }
 
         public int Run()
@@ -85,10 +106,17 @@ namespace RebusCore.Server
 
                         state.Client = client;
 
-                        client.BeginReceive(state.Buffer, 0, StateObject.BufferSize, 0, new AsyncCallback(Receive), state);
+                        client.BeginReceive(state.Buffer,
+                            0,
+                            StateObject.BufferSize,
+                            0,
+                            new AsyncCallback(Receive),
+                            state);
                     }
                 }
             }
+            
+            Dispose();
 
             return 0;
         }
@@ -115,6 +143,8 @@ namespace RebusCore.Server
             if (content.IndexOf("<EOF>", StringComparison.Ordinal) > -1)
             {
                 content = content.Remove(content.IndexOf("<EOF>", StringComparison.Ordinal));
+                
+                _commandHandler.RunCommand(content);
                 
                 Console.WriteLine("Read: " + content);
             }

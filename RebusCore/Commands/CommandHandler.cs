@@ -24,5 +24,14 @@ namespace RebusCore.Commands
         {
             _commands.AddRange(commands);
         }
+
+        public void RunCommand(string cmd)
+        {
+            foreach (ICommand command in _commands)
+            {
+                if (command.Execute(cmd))
+                    break;
+            }
+        }
     }
 }

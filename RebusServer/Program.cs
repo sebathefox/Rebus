@@ -6,15 +6,13 @@ namespace RebusServer
 {
     internal class Program
     {
-        public static void Main(string[] args)
+        public static int Main(string[] args)
         {
-            //TODO: Argument handling.
-            
             Server server = new Server();
             
-            server.Initialize(new IPEndPoint(IPAddress.Any, 1337));
+            server.Initialize(args);
 
-            ConfigLoader.LoadConfig("./kek.txt");
+            return server.Run();
         }
     }
 }

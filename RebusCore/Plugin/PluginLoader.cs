@@ -11,9 +11,9 @@ namespace RebusCore.Plugin
         {
             string[] pluginNames = null;
 
-            if (Directory.Exists(path))
+            if (Directory.Exists(Directory.GetCurrentDirectory() + "/" + path))
             {
-                pluginNames = Directory.GetFiles(path, "*.dll");
+                pluginNames = Directory.GetFiles(Directory.GetCurrentDirectory() + "/" + path,  "*.dll");
                 
                 ICollection<Assembly> assemblies = new List<Assembly>(pluginNames.Length);
 
@@ -35,13 +35,13 @@ namespace RebusCore.Plugin
 
                         foreach (Type type in types)
                         {
+                            if(!(type.GetInterface("IPlugin") != null))
+                                continue;
+                            
                             if(type.IsInterface || type.IsAbstract)
                                 continue;
-                            else
-                            {
-                                if(type.GetInterface(pluginType.FullName) != null)
-                                    pluginTypes.Add(type);
-                            }
+                            if(type.GetInterface(pluginType.FullName) != null)
+                                pluginTypes.Add(type);
                         }
                     }
                 }

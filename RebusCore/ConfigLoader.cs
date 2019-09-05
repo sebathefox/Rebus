@@ -7,13 +7,18 @@ namespace RebusCore
 {
     public static class ConfigLoader
     {
+        private static Dictionary<string, object> _config;
+        
         public static Dictionary<string, object> LoadConfig(string pathToFile)
         {
+            if (_config != null)
+                return _config;
+            
             // If config doesn't exist create default.
             if(!File.Exists(pathToFile))
                 GenerateDefaultConfig(pathToFile);
 
-            return DeserializeConfig(File.ReadAllText(pathToFile));
+            return _config = DeserializeConfig(File.ReadAllText(pathToFile));
         }
 
         public static void GenerateDefaultConfig(string pathToFile, Dictionary<string, object> customConfig = null)
@@ -28,7 +33,10 @@ namespace RebusCore
             {
                 customConfig = new Dictionary<string, object>();
                 
+                customConfig.Add("listenAddress", "0.0.0.0");
                 customConfig.Add("port", 1337);
+                customConfig.Add("pluginFolder", "plugins");
+                customConfig.Add("logLocation", "output.log");
                 
                 File.WriteAllText(pathToFile, SerializeConfig(customConfig), Encoding.UTF8);
             }
@@ -58,7 +66,7 @@ namespace RebusCore
                 if(string.IsNullOrWhiteSpace(line))
                     continue;
                 
-                config.Add(line.Substring(0, line.IndexOf('=')), line.Substring(line.IndexOf('=')));
+                config.Add(line.Substring(0, line.IndexOf('=')), line.Substring(line.IndexOf('=') + 1));
 
                 Console.WriteLine(line);
             }
