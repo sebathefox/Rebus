@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using RebusCore.Commands;
 using RebusCore.Debug;
 using RebusCore.Plugin;
@@ -13,7 +14,7 @@ namespace RebusCore.Server
     /// <summary>
     /// A basic self sustainable server class.
     /// </summary>
-    public sealed class Server : IDisposable
+    public sealed class Server
     {
         #region Fields
 
@@ -33,6 +34,10 @@ namespace RebusCore.Server
 
         private Dictionary<string, object> _config;
 
+        private ManualResetEvent allDone = new ManualResetEvent(false);
+
+        private Thread _receiverThread;
+        
         #endregion
 
         public void Dispose()
@@ -94,26 +99,18 @@ namespace RebusCore.Server
 
         public int Run()
         {
+            _receiverThread = new Thread(ReceiveThread);
+
+            _receiverThread.IsBackground = true;
+            
+            _receiverThread.Start();
+            
             while (_isRunning)
             {
+                allDone.Reset();
+
                 _listener.BeginAccept(new AsyncCallback(Accept), null);
-
-                foreach (Socket client in _clients)
-                {
-                    if (client.Available > 0)
-                    {
-                        StateObject state = new StateObject();
-
-                        state.Client = client;
-
-                        client.BeginReceive(state.Buffer,
-                            0,
-                            StateObject.BufferSize,
-                            0,
-                            new AsyncCallback(Receive),
-                            state);
-                    }
-                }
+                allDone.WaitOne();
             }
             
             Dispose();
@@ -146,7 +143,21 @@ namespace RebusCore.Server
                 
                 _commandHandler.RunCommand(content);
                 
+                string tmpContent = _commandHandler.Result;
+
+                Console.WriteLine(content);
+
+                if (content.StartsWith("/"))
+                {
+                    content = tmpContent;
+                }
+                
                 Console.WriteLine("Read: " + content);
+
+                foreach (Socket socket in _clients)
+                {
+                    Send(socket, content);
+                }
             }
             else
             {
@@ -172,6 +183,29 @@ namespace RebusCore.Server
             catch (Exception e)
             {
                 Console.WriteLine(e);
+            }
+        }
+
+        private void ReceiveThread(object args)
+        {
+            while (true)
+            {
+                foreach (Socket client in _clients)
+                {
+                    if (client.Available > 0)
+                    {
+                        StateObject state = new StateObject();
+
+                        state.Client = client;
+
+                        client.BeginReceive(state.Buffer,
+                            0,
+                            StateObject.BufferSize,
+                            0,
+                            new AsyncCallback(Receive),
+                            state);
+                    }
+                }
             }
         }
 

@@ -10,5 +10,7 @@ namespace RebusCore.Commands
         /// </summary>
         /// <returns>Whether it was a valid command.</returns>
         bool Execute(string command);
+        
+        string Result { get; set; }
     }
 }

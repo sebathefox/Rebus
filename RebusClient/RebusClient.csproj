@@ -32,12 +32,44 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AtkSharp, Version=3.22.25.24, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\AtkSharp.3.22.25.24\lib\netstandard2.0\AtkSharp.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="CairoSharp, Version=3.22.25.24, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\CairoSharp.3.22.25.24\lib\netstandard2.0\CairoSharp.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="GdkSharp, Version=3.22.25.24, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\GdkSharp.3.22.25.24\lib\netstandard2.0\GdkSharp.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="GioSharp, Version=3.22.25.24, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\GioSharp.3.22.25.24\lib\netstandard2.0\GioSharp.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="GLibSharp, Version=3.22.25.24, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\GLibSharp.3.22.25.24\lib\netstandard2.0\GLibSharp.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="GtkSharp, Version=3.22.25.24, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\GtkSharp.3.22.25.24\lib\netstandard2.0\GtkSharp.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="PangoSharp, Version=3.22.25.24, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\PangoSharp.3.22.25.24\lib\netstandard2.0\PangoSharp.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="MonoDevelop.GtkCore, Version=2.6.0.0, Culture=neutral, PublicKeyToken=3ead7498f347467b">
+      <Package>monodevelop-core-addins</Package>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MainWindow.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -46,6 +78,12 @@
       <Project>{798029e6-bb56-46bd-8f17-5d82f4cd6ad3}</Project>
       <Name>RebusCore</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="icon.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace RebusCore.Commands
@@ -8,6 +9,8 @@ namespace RebusCore.Commands
 
         private List<ICommand> _commands;
 
+        private string _result;
+        
         #endregion
 
         public CommandHandler()
@@ -30,7 +33,20 @@ namespace RebusCore.Commands
             foreach (ICommand command in _commands)
             {
                 if (command.Execute(cmd))
+                {
+                    _result = command.Result;
                     break;
+                }
+            }
+        }
+
+        public string Result
+        {
+            get
+            {
+                string tmp = _result;
+                _result = String.Empty;
+                return tmp;
             }
         }
     }
