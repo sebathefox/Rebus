@@ -1,8 +1,11 @@
 using System;
+using System.IO;
 using System.Net;
 using System.Threading;
+using Gdk;
 using Gtk;
 using RebusCore.Client;
+using Window = Gtk.Window;
 
 namespace RebusClient
 {
@@ -13,6 +16,15 @@ namespace RebusClient
         private Label _output;
         private Entry _input;
 
+        private Button _connect;
+        private Entry _connString;
+
+        private byte[] _buffer;
+
+        private Pixbuf _pixbuf;
+        
+        private Image _icon;
+
         private Thread _clientThread;
 
         private Client _client;
@@ -22,7 +34,7 @@ namespace RebusClient
             SetDefaultSize(800, 600);
             SetPosition(WindowPosition.Center);
             Resizable = false;
-            //SetIconFromFile("icon.png");
+            SetIconFromFile("icon.png");
 
             DeleteEvent += OnDelete;
             
@@ -35,10 +47,32 @@ namespace RebusClient
             
             _output = new Label("");
             _output.SetSizeRequest(650, 400);
-            
+            _output.Wrap = true;
+
             _input = new Entry();
             _input.SetSizeRequest(600, 25);
 
+            _buffer = File.ReadAllBytes("icon.png");
+            
+            _pixbuf = new Pixbuf(_buffer);
+
+            _icon = new Image(_pixbuf);
+            _icon.SetSizeRequest(64, 64);
+
+            _connect = new Button(_icon);
+            _connect.SetSizeRequest(64, 64);
+            
+
+            _connect.Clicked += Connect;
+            
+            _container.Put(_connect, 0, 0);
+            
+            _connString = new Entry();
+            
+            _container.Put(_connString, 192, 0);
+            
+            _container.Put(_icon, 0, 0);
+            
             _container.Put(_input, 50, 550);
             _container.Put(_output, 50, 50);
             _container.Put(_send, 700, 550);
@@ -49,14 +83,18 @@ namespace RebusClient
             
             _client = new Client();
             
-            _client.Connect(new IPEndPoint(IPAddress.Loopback, 1337));
+            ShowAll();
+        }
+
+        private void Connect(object sender, EventArgs e)
+        {
+            //TODO: Make it dynamically connect to a server through an interface.
+            _client.Connect(new IPEndPoint(IPAddress.Parse(_connString.Text), 1337));
             
             _client.OnDataReceived += OnReceived;
             _clientThread = new Thread(ClientThread);
             
             _clientThread.Start();
-            
-            ShowAll();
         }
 
         private void OnSendClicked(object sender, EventArgs e)
@@ -67,6 +105,8 @@ namespace RebusClient
         private void OnDelete(object sender, DeleteEventArgs args)
         {
             _clientThread.Interrupt();
+            _client.Disconnect();
+            _client.Dispose();
             
             Application.Quit();
         }

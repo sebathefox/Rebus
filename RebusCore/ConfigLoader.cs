@@ -5,10 +5,18 @@ using System.Text;
 
 namespace RebusCore
 {
+    /// <summary>
+    /// Loader class that loads the configs.
+    /// </summary>
     public static class ConfigLoader
     {
         private static Dictionary<string, object> _config;
         
+        /// <summary>
+        /// Loads the config at the specified location.
+        /// </summary>
+        /// <param name="pathToFile">The location of the config.</param>
+        /// <returns>A dictionary containing key value pairs from the config.</returns>
         public static Dictionary<string, object> LoadConfig(string pathToFile)
         {
             if (_config != null)
@@ -21,6 +29,11 @@ namespace RebusCore
             return _config = DeserializeConfig(File.ReadAllText(pathToFile));
         }
 
+        /// <summary>
+        /// Generates a new default config with the default settings.
+        /// </summary>
+        /// <param name="pathToFile">The location of the file.</param>
+        /// <param name="customConfig">The overrides to the config if any.</param>
         public static void GenerateDefaultConfig(string pathToFile, Dictionary<string, object> customConfig = null)
         {
             if (customConfig != null)
@@ -43,6 +56,11 @@ namespace RebusCore
             
         }
 
+        /// <summary>
+        /// Serializes the config to a string that can be written to the config.
+        /// </summary>
+        /// <param name="data">The config to write.</param>
+        /// <returns>The serialized string version of the config.</returns>
         private static string SerializeConfig(Dictionary<string, object> data)
         {
             string config = String.Empty;
@@ -55,6 +73,11 @@ namespace RebusCore
             return config;
         }
 
+        /// <summary>
+        /// Deserializes the config from a <see cref="string"/> to a <see cref="Dictionary{TKey,TValue}"/> object.
+        /// </summary>
+        /// <param name="data">The raw string from the config.</param>
+        /// <returns>The <see cref="Dictionary{TKey,TValue}"/> object.</returns>
         private static Dictionary<string, object> DeserializeConfig(string data)
         {
             Dictionary<string, object> config = new Dictionary<string, object>();

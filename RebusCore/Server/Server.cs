@@ -30,16 +30,23 @@ namespace RebusCore.Server
         // A list of used plugins.
         private ICollection<IPlugin> _plugins = null;
 
+        // A handler to manage commands.
         private CommandHandler _commandHandler;
 
+        // The running config.
         private Dictionary<string, object> _config;
 
+        // Used by threads.
         private ManualResetEvent allDone = new ManualResetEvent(false);
 
+        // Listens and receives data from the clients.
         private Thread _receiverThread;
         
         #endregion
 
+        /// <summary>
+        /// Disposes the server in a safe manner.
+        /// </summary>
         public void Dispose()
         {
             _listener.Close();
@@ -59,8 +66,10 @@ namespace RebusCore.Server
         /// <param name="args">The program arguments if any.</param>
         public void Initialize(string[] args)
         {
+            // Loads the config from file.
             _config = ConfigLoader.LoadConfig("./config.txt");
             
+            // Initializes the logger.
             Logger.Init(_config["logLocation"].ToString());
             
             _isRunning = true;
@@ -71,20 +80,8 @@ namespace RebusCore.Server
             _clients = new ConcurrentBag<Socket>();
             _commandHandler = new CommandHandler();
             
-            Logger.Log("Loading Plugins...");
-            
-            _plugins = PluginLoader.LoadPlugins(_config["pluginFolder"].ToString());
-            
-            foreach (IPlugin plugin in _plugins)
-            {
-                plugin.Initialize();
+            LoadPlugins();
 
-                Logger.Log("LOADED PLUGIN: " + plugin.GetType().ToString());
-                
-                _commandHandler.AddCommands(plugin.GetCommands());
-            }
-            
-                
             IPEndPoint ep = new IPEndPoint(IPAddress.Parse(_config["listenAddress"].ToString()),
             int.Parse(_config["port"].ToString()));
             
@@ -97,6 +94,10 @@ namespace RebusCore.Server
             Logger.Log("Listening...");
         }
 
+        /// <summary>
+        /// Begins the server. Will block the current thread as it is partially synchronous.
+        /// </summary>
+        /// <returns>The error code on failure otherwise zero.</returns>
         public int Run()
         {
             _receiverThread = new Thread(ReceiveThread);
@@ -118,11 +119,83 @@ namespace RebusCore.Server
             return 0;
         }
 
+        /// <summary>
+        /// Sends a message to the specified client.
+        /// </summary>
+        /// <param name="client">The target client of the message.</param>
+        /// <param name="data">The data to send.</param>
+        private void Send(Socket client, String data)
+        {
+            byte[] byteData = Encoding.UTF8.GetBytes(data);
+
+            client.BeginSend(byteData, 0, byteData.Length, 0, new AsyncCallback(SendCallback), client);
+        }
+
+        /// <summary>
+        /// The receive thread entrypoint.
+        /// </summary>
+        /// <param name="args">The arguments if any.</param>
+        private void ReceiveThread(object args)
+        {
+            while (true)
+            {
+                foreach (Socket client in _clients)
+                {
+                    if (client.Connected)
+                    {
+                        if (client.Available > 0)
+                        {
+                            StateObject state = new StateObject();
+
+                            state.Client = client;
+
+                            client.BeginReceive(state.Buffer,
+                                0,
+                                StateObject.BufferSize,
+                                0,
+                                new AsyncCallback(Receive),
+                                state);
+                        }
+                    }
+                }
+            }
+        }
+        
+        /// <summary>
+        /// Loads all the plugins it finds in the folder specified by the running config.
+        /// </summary>
+        private void LoadPlugins()
+        {
+            Logger.Log("Loading Plugins...");
+            
+            _plugins = PluginLoader.LoadPlugins(_config["pluginFolder"].ToString());
+            
+            foreach (IPlugin plugin in _plugins)
+            {
+                plugin.Initialize();
+
+                Logger.Log("LOADED PLUGIN: " + plugin.GetType().ToString());
+                
+                _commandHandler.AddCommands(plugin.GetCommands());
+            }
+        }
+        
+        #region Callbacks
+
+        /// <summary>
+        /// Callback method to run when a client tries to connect.
+        /// </summary>
+        /// <param name="ar">The asynchronous state object.</param>
         private void Accept(IAsyncResult ar)
         {
             _clients.Add(_listener.EndAccept(ar));
+            allDone.Set();
         }
 
+        /// <summary>
+        /// Callback method for when data is received from a client.
+        /// </summary>
+        /// <param name="ar">The asynchronous state object.</param>
         private void Receive(IAsyncResult ar)
         {
             String content = String.Empty;
@@ -147,6 +220,7 @@ namespace RebusCore.Server
 
                 Console.WriteLine(content);
 
+                //TODO: FIX and use something else than hardcoded value. 
                 if (content.StartsWith("/"))
                 {
                     content = tmpContent;
@@ -164,14 +238,11 @@ namespace RebusCore.Server
                 client.BeginReceive(state.Buffer, 0, StateObject.BufferSize, 0, new AsyncCallback(Receive), state);
             }
         }
-
-        private void Send(Socket client, String data)
-        {
-            byte[] byteData = Encoding.UTF8.GetBytes(data);
-
-            client.BeginSend(byteData, 0, byteData.Length, 0, new AsyncCallback(SendCallback), client);
-        }
-
+        
+        /// <summary>
+        /// Callback method for when data is being sent from the server to the clients.
+        /// </summary>
+        /// <param name="ar">The asynchronous state object.</param>
         private void SendCallback(IAsyncResult ar)
         {
             try
@@ -185,33 +256,7 @@ namespace RebusCore.Server
                 Console.WriteLine(e);
             }
         }
-
-        private void ReceiveThread(object args)
-        {
-            while (true)
-            {
-                foreach (Socket client in _clients)
-                {
-                    if (client.Available > 0)
-                    {
-                        StateObject state = new StateObject();
-
-                        state.Client = client;
-
-                        client.BeginReceive(state.Buffer,
-                            0,
-                            StateObject.BufferSize,
-                            0,
-                            new AsyncCallback(Receive),
-                            state);
-                    }
-                }
-            }
-        }
-
-        private void LoadPlugins(string path)
-        {
-            _plugins = PluginLoader.LoadPlugins(path);
-        }
+        
+        #endregion
     }
 }

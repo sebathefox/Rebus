@@ -5,19 +5,31 @@ using System.Text;
 
 namespace RebusCore.Client
 {
+    /// <summary>
+    /// The client class used by the official Rebus client.
+    /// </summary>
     public class Client : IClient
     {
         private Socket _client;
 
         private string _data = String.Empty;
 
+        /// <summary>
+        /// Called when data is received.
+        /// </summary>
         public event EventHandler<string> OnDataReceived;
         
+        /// <summary>
+        /// Creates a new client.
+        /// </summary>
         public Client()
         {
             _client = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
         }
         
+        /// <summary>
+        /// Disposes the client.
+        /// </summary>
         public void Dispose()
         {
             
@@ -39,6 +51,10 @@ namespace RebusCore.Client
             }
         }
 
+        /// <summary>
+        /// Sends a message to the server.
+        /// </summary>
+        /// <param name="message">The string message to send.</param>
         public void Send(string message)
         {
             StateObject state = new StateObject();
@@ -60,12 +76,20 @@ namespace RebusCore.Client
             
         }
 
+        /// <summary>
+        /// Callback to run when the client have connected successfully.
+        /// </summary>
+        /// <param name="ar">The async state object.</param>
         private void ConnectCallback(IAsyncResult ar)
         {
             _client.EndConnect(ar);
             Console.WriteLine("Connected");
         }
 
+        /// <summary>
+        /// Callback to run when the client have sent data successfully.
+        /// </summary>
+        /// <param name="ar">The async state object.</param>
         private void SendCallback(IAsyncResult ar)
         {
             StateObject state = (StateObject) ar.AsyncState;
@@ -74,6 +98,10 @@ namespace RebusCore.Client
             client.EndSend(ar);
         }
 
+        /// <summary>
+        /// Callback to run when the client have received data from the server.
+        /// </summary>
+        /// <param name="ar">The async state object.</param>
         private void ReceiveCallback(IAsyncResult ar)
         {
             StateObject state = (StateObject) ar.AsyncState;

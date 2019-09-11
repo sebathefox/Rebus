@@ -5,8 +5,16 @@ using System.Reflection;
 
 namespace RebusCore.Plugin
 {
+    /// <summary>
+    /// Contains the methods for dynamic loading of plugins.
+    /// </summary>
     public static class PluginLoader
     {
+        /// <summary>
+        /// Loads the plugin assemblies and returns them as a collection.
+        /// </summary>
+        /// <param name="path">The path to the folder to search for plugins.</param>
+        /// <returns>Returns the collection of found plugins.</returns>
         public static ICollection<IPlugin> LoadPlugins(string path)
         {
             string[] pluginNames = null;

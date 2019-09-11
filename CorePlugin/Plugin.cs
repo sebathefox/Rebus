@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq.Expressions;
 using CorePlugin.Commands;
 using RebusCore.Commands;
 using RebusCore.Plugin;
