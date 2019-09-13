@@ -13,6 +13,7 @@ namespace CorePlugin
         {
             _commands = new List<ICommand>();
             _commands.Add(new PingCommand());
+            _commands.Add(new IpCommand());
         }
 
         public ICollection<ICommand> GetCommands()

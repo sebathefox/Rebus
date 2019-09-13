@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Security.AccessControl;
+using RebusCore.Debug;
 
 namespace RebusCore.Plugin
 {
@@ -19,6 +21,9 @@ namespace RebusCore.Plugin
         {
             string[] pluginNames = null;
 
+            if (!Directory.Exists(Directory.GetCurrentDirectory() + "/" + path))
+                Directory.CreateDirectory(Directory.GetCurrentDirectory() + "/" + path);
+            
             if (Directory.Exists(Directory.GetCurrentDirectory() + "/" + path))
             {
                 pluginNames = Directory.GetFiles(Directory.GetCurrentDirectory() + "/" + path,  "*.dll");

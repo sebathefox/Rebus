@@ -14,7 +14,7 @@ namespace RebusCore.Server
     /// <summary>
     /// A basic self sustainable server class.
     /// </summary>
-    public sealed class Server
+    public sealed class Server : IDisposable
     {
         #region Fields
 
@@ -49,6 +49,8 @@ namespace RebusCore.Server
         /// </summary>
         public void Dispose()
         {
+            _receiverThread.Abort();
+            
             _listener.Close();
             _listener.Dispose();
             
@@ -90,8 +92,6 @@ namespace RebusCore.Server
             _listener.Bind(ep);
 
             Logger.Log("Bound");
-            _listener.Listen(10);
-            Logger.Log("Listening...");
         }
 
         /// <summary>
@@ -100,6 +100,9 @@ namespace RebusCore.Server
         /// <returns>The error code on failure otherwise zero.</returns>
         public int Run()
         {
+            _listener.Listen(10);
+            Logger.Log("Listening...");
+            
             _receiverThread = new Thread(ReceiveThread);
 
             _receiverThread.IsBackground = true;
@@ -126,6 +129,9 @@ namespace RebusCore.Server
         /// <param name="data">The data to send.</param>
         private void Send(Socket client, String data)
         {
+            if (string.IsNullOrWhiteSpace(data))
+                return;
+            
             byte[] byteData = Encoding.UTF8.GetBytes(data);
 
             client.BeginSend(byteData, 0, byteData.Length, 0, new AsyncCallback(SendCallback), client);

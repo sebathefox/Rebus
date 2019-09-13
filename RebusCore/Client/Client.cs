@@ -32,7 +32,8 @@ namespace RebusCore.Client
         /// </summary>
         public void Dispose()
         {
-            
+            _client.Close();
+            _client.Dispose();
         }
 
         public void Initialize()
@@ -55,8 +56,12 @@ namespace RebusCore.Client
         /// Sends a message to the server.
         /// </summary>
         /// <param name="message">The string message to send.</param>
-        public void Send(string message)
+        /// <returns>Whether the operation has succeeded or failed.</returns>
+        public bool Send(string message)
         {
+            if(!_client.Connected)
+                return false;
+        
             StateObject state = new StateObject();
 
             state.Client = _client;
@@ -64,6 +69,7 @@ namespace RebusCore.Client
             byte[] buff = Encoding.UTF8.GetBytes(message);
                     
             _client.BeginSend(buff, 0, buff.Length, SocketFlags.None, new AsyncCallback(SendCallback), state);
+            return true;
         }
 
         public void Connect(IPEndPoint ep)

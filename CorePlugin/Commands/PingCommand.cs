@@ -8,9 +8,13 @@ namespace CorePlugin.Commands
         
         public bool Execute(string command)
         {
-            if(command.Contains("/ping"))
+            if (command.Contains("/ping"))
+            {
                 Result = "Pong";
-            return true;
+                return true;
+            }
+
+            return false;
         }
 
         public string Result { get; set; }

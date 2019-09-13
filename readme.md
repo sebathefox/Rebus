@@ -27,7 +27,12 @@ Self hosting
 Hubs?
 
 ### Documentation
-The program will use Sockets to connect to the server...
+
+#### Client
+The program is made so that it can connect to a server where there will be a chat available to the user.
+
+#### Server
+The server program will be publicly available so the users have the possibility to host their own servers.
 
 
 ### Descriptions

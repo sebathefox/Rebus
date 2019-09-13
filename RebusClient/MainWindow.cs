@@ -11,6 +11,8 @@ namespace RebusClient
 {
     public class MainWindow : Window
     {
+        #region Fields
+        
         private Fixed _container;
         private Button _send;
         private Label _output;
@@ -28,6 +30,8 @@ namespace RebusClient
         private Thread _clientThread;
 
         private Client _client;
+        
+        #endregion
         
         public MainWindow(string title) : base(title)
         {
@@ -47,14 +51,15 @@ namespace RebusClient
             
             _output = new Label("");
             _output.SetSizeRequest(650, 400);
-            _output.Wrap = true;
+            _output.LineWrap = true;
+            _output.Justify = Justification.Left;
 
             _input = new Entry();
             _input.SetSizeRequest(600, 25);
 
             _buffer = File.ReadAllBytes("icon.png");
             
-            _pixbuf = new Pixbuf(_buffer);
+            _pixbuf = new Pixbuf(_buffer, 64, 64);
 
             _icon = new Image(_pixbuf);
             _icon.SetSizeRequest(64, 64);
@@ -99,12 +104,16 @@ namespace RebusClient
 
         private void OnSendClicked(object sender, EventArgs e)
         {
-            _client.Send(_input.Text + "<EOF>");
+            if (!_client.Send(_input.Text + "<EOF>"))
+            {
+                _output.Text += "ERROR: COULD NOT SEND TO SERVER!\n";
+            }
         }
 
         private void OnDelete(object sender, DeleteEventArgs args)
         {
-            _clientThread.Interrupt();
+//            _clientThread.Interrupt();
+            _clientThread.Abort();
             _client.Disconnect();
             _client.Dispose();
             
@@ -118,7 +127,7 @@ namespace RebusClient
 
         private void OnReceived(object sender, string message)
         {
-            _output.Text += message += "\r\n";
+            _output.Text += message += "\n";
         }
     }
 }
