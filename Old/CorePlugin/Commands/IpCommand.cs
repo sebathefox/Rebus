@@ -11,7 +11,7 @@ namespace CorePlugin.Commands
             {
                 Result = "ADDRESSES: \r\n";
                 
-                foreach (IPAddress ipAddress in Dns.GetHostAddresses("127.0.0.1"))
+                foreach (IPAddress ipAddress in Dns.GetHostAddresses("localhost"))
                 {
                     Result += ipAddress.ToString() + "\r\n";
                 }

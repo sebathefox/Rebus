@@ -151,9 +151,8 @@ namespace RebusCore.Server
                     {
                         if (client.Available > 0)
                         {
-                            StateObject state = new StateObject();
+                            StateObject state = new StateObject {Client = client};
 
-                            state.Client = client;
 
                             client.BeginReceive(state.Buffer,
                                 0,
